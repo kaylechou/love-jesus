@@ -2,10 +2,10 @@
 
 真理探索学习平台——教会团契的在线互动课件与答题系统。Cloudflare Worker + D1 实现，模块化源码结构。
 
-- 线上地址：https://lovejesus.kaylechou.dpdns.org/
+- 线上地址：（线上地址）
 - 管理后台：`/admin`
 - 更新记录：[CHANGELOG.md](./CHANGELOG.md)（按时间倒序）
-- 姊妹项目：[kaylechou/love](https://github.com/kaylechou/love)（单文件版本，两项目互为备份、数据双向同步）
+- 姊妹项目：[姊妹项目](姊妹项目仓库)（单文件版本，两项目互为备份、数据双向同步）
 
 ---
 
@@ -57,8 +57,8 @@ python3 ~/workspace/skills/cloudflare/bin/cf.py deploy \
 
 | 项目 | Worker | D1 数据库 | 域名 | GitHub |
 |---|---|---|---|---|
-| love | love | fellowship_db | love.kaylechou.dpdns.org | kaylechou/love |
-| love-jesus | love-jesus | fellowship_db_jesus | lovejesus.kaylechou.dpdns.org | kaylechou/love-jesus |
+| love | love | fellowship_db | （姊妹项目域名） | 姊妹项目 |
+| love-jesus | love-jesus | fellowship_db_jesus | （本项目域名） | 本仓库 |
 
 - **代码同步**：每次更新同时部署到两个 Worker、推送到两个 GitHub 库
 - **数据同步**：每小时双向同步一次（courses、categories、settings），以 `updated_at` 时间戳为准，新的覆盖旧的
