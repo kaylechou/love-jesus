@@ -49,12 +49,12 @@ const gJson = JSON.stringify(Array.isArray(b.guide) ? b.guide : []);
 const mode = b.mode === "study"? "study": "quiz";
 const cat = b.category || "默认", sub = ((b.subcategory || "") + "").trim().replace(/\+/g, "\u2022");
 if (b.id && b.id.length > 5) {
-await env.DB.prepare("UPDATE courses SET category=?, subcategory=?, title=?, content=?, quizzes_json=?, video_url=?, mode=?, guide_json=?, instructions=? WHERE id=?")
-.bind(cat, sub, b.title, b.content, qJson, b.video_url || "", mode, gJson, b.instructions || "", b.id).run();
+await env.DB.prepare("UPDATE courses SET category=?, subcategory=?, title=?, content=?, quizzes_json=?, video_url=?, mode=?, guide_json=?, instructions=?, updated_at=? WHERE id=?")
+.bind(cat, sub, b.title, b.content, qJson, b.video_url || "", mode, gJson, b.instructions || "", new Date().toISOString(), b.id).run();
 } else {
 const so = await nextSortOrder(env);
-await env.DB.prepare("INSERT INTO courses (id, category, subcategory, title, content, quizzes_json, video_url, mode, guide_json, instructions, sort_order) VALUES (?,?,?,?,?,?,?,?,?,?,?)")
-.bind("ID-" + Date.now(), cat, sub, b.title, b.content, qJson, b.video_url || "", mode, gJson, b.instructions || "", so).run();
+await env.DB.prepare("INSERT INTO courses (id, category, subcategory, title, content, quizzes_json, video_url, mode, guide_json, instructions, sort_order, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)")
+.bind("ID-" + Date.now(), cat, sub, b.title, b.content, qJson, b.video_url || "", mode, gJson, b.instructions || "", so, new Date().toISOString()).run();
 }
 // 课程的系列/子栏目自动登记（简介为空，管理端后续补填即可）
 await env.DB.prepare("INSERT OR IGNORE INTO categories (parent, name) VALUES (?,?)").bind("", cat).run();
@@ -83,8 +83,8 @@ let n = 0, so = await nextSortOrder(env);
 for (const c of arr) {
 if (!c ||!c.title) continue;
 const qs = Array.isArray(c.quizzes)? c.quizzes: [];
-await env.DB.prepare("INSERT INTO courses (id, category, subcategory, title, content, quizzes_json, video_url, mode, guide_json, instructions, sort_order) VALUES (?,?,?,?,?,?,?,?,?,?,?)")
-.bind("ID-" + Date.now() + "-" + n, c.category || "默认", ((c.subcategory || "") + "").trim(), c.title, c.content || "", JSON.stringify(qs), c.video_url || "", c.mode === "study"? "study": "quiz", JSON.stringify(Array.isArray(c.guide) ? c.guide : []), c.instructions || "", so + n).run();
+await env.DB.prepare("INSERT INTO courses (id, category, subcategory, title, content, quizzes_json, video_url, mode, guide_json, instructions, sort_order, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)")
+.bind("ID-" + Date.now() + "-" + n, c.category || "默认", ((c.subcategory || "") + "").trim(), c.title, c.content || "", JSON.stringify(qs), c.video_url || "", c.mode === "study"? "study": "quiz", JSON.stringify(Array.isArray(c.guide) ? c.guide : []), c.instructions || "", so + n, new Date().toISOString()).run();
 await env.DB.prepare("INSERT OR IGNORE INTO categories (parent, name) VALUES (?,?)").bind("", c.category || "默认").run();
 const csub = ((c.subcategory || "") + "").trim();
 if (csub) await env.DB.prepare("INSERT OR IGNORE INTO categories (parent, name) VALUES (?,?)").bind(c.category || "默认", csub).run();
@@ -160,7 +160,7 @@ const oldName = ((b.oldName || "") + "").trim();
 const parent = ((b.parent || "") + "").trim();
 const now = new Date().toISOString();
 async function upsert(p, n, d) {
-await env.DB.prepare("INSERT INTO categories (parent, name, description, created_at) VALUES (?,?,?,?) ON CONFLICT(parent, name) DO UPDATE SET description=excluded.description").bind(p, n, d, now).run();
+await env.DB.prepare("INSERT INTO categories (parent, name, description, created_at, updated_at) VALUES (?,?,?,?,?) ON CONFLICT(parent, name) DO UPDATE SET description=excluded.description, updated_at=excluded.updated_at").bind(p, n, d, now, now).run();
 }
 if (!parent) {
 if (oldName && oldName !== name) {
