@@ -9,15 +9,15 @@
 - 从 love 项目完整拆分出模块化结构（13 个模块 + build.py 构建脚本）
 - 构建输出与原 worker.js 逐字节一致（360778 字节）
 - 新建 Cloudflare Worker `love-jesus`，绑定新 D1 `fellowship_db_jesus`
-- 绑定域名 https://lovejesus.kaylechou.dpdns.org/
-- 新建 GitHub 仓库 kaylechou/love-jesus，推送全部模块源码
+- 绑定域名 （线上地址）
+- 新建 GitHub 仓库 本仓库，推送全部模块源码
 - D1 表结构复制：courses（97 门）、categories（13 个）、settings、bible_verses（92 处）
 - 三表新增 `updated_at` 时间戳字段，写入时自动更新
 - 建立双向同步机制：
   - 代码：每次更新同时部署双 Worker、推送双 GitHub 库
   - 数据：每小时双向同步（courses/categories/settings），以 updated_at 为准
   - 隐私数据（students/wrongs/progress）各自独立，不同步
-- 自动备份：每天 04:21 备份 fellowship_db_jesus 到 kaylechou/love-jesus
+- 自动备份：每天 04:21 备份 fellowship_db_jesus 到 本仓库
 
 ### 继承自 love 项目的全部功能（第 1–132 次部署）
 
