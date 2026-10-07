@@ -20,7 +20,7 @@
                 document.getElementById('teacherBtn').innerText = tr("teacherBtn");
                 return;
             }
-            var ansUrl = '/api/answers?course_id=' + encodeURIComponent(activeLessonId || "");
+            var ansUrl = '/api/answers?course_id=' + encodeURIComponent(activeLessonId || "") + '&lang=' + encodeURIComponent(curLang());
             var isStuAdmin = !BOOT.isAdmin && studentIsAdmin();
             if (isStuAdmin) ansUrl += '&username=' + encodeURIComponent(progName()) + '&token=' + encodeURIComponent(studentToken());
             var r = await fetch(ansUrl);
