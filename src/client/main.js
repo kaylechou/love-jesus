@@ -322,10 +322,11 @@ function i18nCourse(c) {
         /* 小工具 */
         function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
         function stripEmoji(s) { return String(s == null ? "" : s).replace(/^[📖📜\s]+/, ""); } /* 去掉标题开头自带的 📖，避免与固定图标重复 */
-        /* 去掉经文题干开头的"【经文填空】"等字样 */
+        /* 去掉经文题干开头的"【经文填空】"等字样（支持翻译后的[]版本） */
         function stripVerseTag(s) {
             s = String(s == null ? "" : s);
             if (s.charAt(0) === '【') { var e = s.indexOf('】'); if (e > 0 && e < 12) s = s.slice(e + 1); }
+            else if (s.charAt(0) === '[') { var e2 = s.indexOf(']'); if (e2 > 0 && e2 < 40) s = s.slice(e2 + 1); }
             return s;
         }
         /* 经文高亮：引用→紫色徽章（完整显示），引用后经文正文→琥珀底纹；s须为已转义文本 */
@@ -432,8 +433,21 @@ function i18nCourse(c) {
             var SP = ' *';
             var DASH = '[\u2013\u2014\uFF0D-]';
             /* vref：fmt=en/ja/ko/zh，输出对应语言格式的徽章 */
+            var BOOK_ZH2KO = null;
+            function bookZh2Ko(nm) {
+                if (!BOOK_ZH2KO) {
+                    var ko = BIBLE_BOOKS_KO.split('|'), zh = '撒母耳记上|撒母耳记下|列王纪上|列王纪下|历代志上|历代志下|哥林多前书|哥林多后书|帖撒罗尼迦前书|帖撒罗尼迦后书|提摩太前书|提摩太后书|彼得前书|彼得后书|约翰一书|约翰二书|约翰三书|创世记|出埃及记|利未记|民数记|申命记|约书亚记|士师记|路得记|以斯拉记|尼希米记|以斯帖记|约伯记|诗篇|箴言|传道书|雅歌|以赛亚书|耶利米书|耶利米哀歌|以西结书|但以理书|何西阿书|约珥书|阿摩司书|俄巴底亚书|约拿书|弥迦书|那鸿书|哈巴谷书|西番雅书|哈该书|撒迦利亚书|玛拉基书|马太福音|马可福音|路加福音|约翰福音|使徒行传|罗马书|加拉太书|以弗所书|腓立比书|歌罗西书|提多书|腓利门书|希伯来书|雅各书|犹大书|启示录'.split('|');
+                    BOOK_ZH2KO = {};
+                    for (var i = 0; i < zh.length && i < ko.length; i++) BOOK_ZH2KO[zh[i]] = ko[i];
+                    // 简称也映射
+                    var abbr = '撒上|撒下|王上|王下|代上|代下|林前|林后|帖前|帖后|提前|提后|彼前|彼后|约壹|约贰|约叁|创|出|利|民|申|书|士|得|拉|尼|斯|伯|诗|箴|传|歌|赛|耶|哀|结|但|何|珥|摩|俄|拿|弥|鸿|哈|番|该|亚|玛|太|可|路|约|徒|罗|加|弗|腓|西|多|门|来|雅|犹|启'.split('|');
+                    for (var j = 0; j < abbr.length && j < ko.length; j++) BOOK_ZH2KO[abbr[j]] = ko[j];
+                }
+                return BOOK_ZH2KO[nm] || nm;
+            }
             function vref(bk, ch, vs, ve, fmt) {
                 var numTxt, bookTxt = bk;
+                if (fmt === 'ko') bookTxt = bookZh2Ko(bookFull(bk));
                 if (fmt === 'en') {
                     numTxt = ch + (vs ? ':' + vs + (ve ? '-' + ve : '') : '');
                 } else if (fmt === 'ja') {
